@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Generates the Chrome Web Store screenshots (1280x800) as SVG, then PNG via
-rsvg-convert. Hands are drawn as the 21-point MediaPipe skeleton the
-extension actually tracks. Run from anywhere: python3 assets/screenshots/make.py"""
+rsvg-convert. Hands are Blender renders from hands/render_hands.py; run that
+first after changing hands/poses.json. Run from anywhere:
+python3 assets/screenshots/make.py"""
 import base64
+import json
 import os
 import subprocess
 
@@ -14,44 +16,43 @@ GREEN = "#06d6a0"
 with open(os.path.join(HERE, "..", "..", "icons", "icon48.png"), "rb") as _f:
     ICON_URI = "data:image/png;base64," + base64.b64encode(_f.read()).decode()
 
-BONES = [(0, 1), (1, 2), (2, 3), (3, 4), (0, 5), (5, 6), (6, 7), (7, 8),
-         (5, 9), (9, 10), (10, 11), (11, 12), (9, 13), (13, 14), (14, 15),
-         (15, 16), (13, 17), (17, 18), (18, 19), (19, 20), (0, 17)]
-
-# Right hand, palm to camera, in a ~240x300 box. Index 4 = thumb tip, 8 = index tip.
-OPEN = [(120, 285), (82, 256), (56, 222), (42, 188), (36, 156),
-        (94, 168), (86, 122), (82, 92), (80, 62),
-        (124, 162), (125, 110), (126, 76), (127, 46),
-        (151, 170), (158, 124), (163, 94), (166, 68),
-        (175, 188), (188, 154), (196, 132), (202, 110)]
-PINCH = [(120, 285), (84, 254), (62, 222), (50, 180), (60, 138),
-         (94, 168), (78, 126), (62, 102), (53, 113),
-         (124, 162), (122, 112), (121, 80), (121, 52),
-         (151, 170), (156, 126), (160, 98), (163, 74),
-         (175, 188), (186, 156), (193, 136), (198, 116)]
+def _load_hand(pose):
+    with open(os.path.join(HERE, "hands", f"{pose}.png"), "rb") as f:
+        uri = "data:image/png;base64," + base64.b64encode(f.read()).decode()
+    with open(os.path.join(HERE, "hands", f"{pose}.json")) as f:
+        meta = json.load(f)
+    return uri, meta
 
 
-def hand(pts, x, y, s=1.0, opacity=1.0, pinched=False):
-    P = [(x + px * s, y + py * s) for px, py in pts]
-    sw, r = 7 * s, 6.5 * s
-    out = [f'<g opacity="{opacity}">']
-    for a, b in BONES:
-        out.append(f'<line x1="{P[a][0]:.1f}" y1="{P[a][1]:.1f}" x2="{P[b][0]:.1f}" y2="{P[b][1]:.1f}" '
-                   f'stroke="#fff" stroke-opacity=".55" stroke-width="{sw:.1f}" stroke-linecap="round"/>')
-    for i, (px, py) in enumerate(P):
-        if i in (4, 8):
-            continue
-        out.append(f'<circle cx="{px:.1f}" cy="{py:.1f}" r="{r:.1f}" fill="#fff"/>')
-    # thumb/index highlight, as drawn by the real preview overlay
-    col = GREEN if pinched else "#ffffff"
-    (tx, ty), (ix, iy) = P[4], P[8]
-    out.append(f'<line x1="{tx:.1f}" y1="{ty:.1f}" x2="{ix:.1f}" y2="{iy:.1f}" stroke="{col}" stroke-width="{5*s:.1f}" stroke-linecap="round"/>')
-    tip_r = 10.5 * s
-    if pinched:
-        cx, cy = (tx + ix) / 2, (ty + iy) / 2
-        out.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{27*s:.1f}" fill="{GREEN}" fill-opacity=".2"/>')
-    for px, py in (P[4], P[8]):
-        out.append(f'<circle cx="{px:.1f}" cy="{py:.1f}" r="{tip_r:.1f}" fill="{col}"/>')
+HANDS = {pose: _load_hand(pose) for pose in ("open", "pinch")}
+
+# Fades the forearm out toward the bottom of each hand render.
+HAND_DEFS = """
+  <linearGradient id="fadeGrad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset=".62" stop-color="#fff"/><stop offset=".86" stop-color="#000"/>
+  </linearGradient>
+  <mask id="fade" maskContentUnits="objectBoundingBox"><rect width="1" height="1" fill="url(#fadeGrad)"/></mask>"""
+
+
+def hand(pose, x, y, s=1.0, opacity=1.0, dots=True):
+    """Illustrated hand render at (x, y) scaled by s, with the thumb/index
+    tracking overlay the real preview draws (green when pinched)."""
+    uri, meta = HANDS[pose]
+    w, h = meta["w"] * s, meta["h"] * s
+    out = [f'<g opacity="{opacity}">',
+           f'<image x="{x:.1f}" y="{y:.1f}" width="{w:.1f}" height="{h:.1f}" href="{uri}" mask="url(#fade)"/>']
+    if dots:
+        (tx, ty), (ix, iy) = [(x + px * s, y + py * s) for px, py in (meta["points"][4], meta["points"][8])]
+        if pose == "pinch":
+            cx, cy = (tx + ix) / 2, (ty + iy) / 2
+            # a ring, so the touching fingertips stay visible inside it
+            out.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{17*s:.1f}" fill="{GREEN}" fill-opacity=".12" '
+                       f'stroke="{GREEN}" stroke-width="{3*s:.1f}"/>')
+        else:
+            out.append(f'<line x1="{tx:.1f}" y1="{ty:.1f}" x2="{ix:.1f}" y2="{iy:.1f}" stroke="#fff" stroke-opacity=".75" '
+                       f'stroke-width="{3*s:.1f}" stroke-dasharray="{6*s:.1f} {6*s:.1f}" stroke-linecap="round"/>')
+            for px, py in ((tx, ty), (ix, iy)):
+                out.append(f'<circle cx="{px:.1f}" cy="{py:.1f}" r="{7.5*s:.1f}" fill="#fff" stroke="{MINT}" stroke-width="{2.5*s:.1f}"/>')
     out.append('</g>')
     return "\n".join(out)
 
@@ -60,7 +61,7 @@ def background(extra=""):
     return f'''<defs>
   <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
     <stop offset="0" stop-color="#17664d"/><stop offset="1" stop-color="#082b20"/>
-  </linearGradient>{extra}
+  </linearGradient>{HAND_DEFS}{extra}
 </defs>
 <rect width="{W}" height="{H}" fill="url(#bg)"/>'''
 
@@ -115,15 +116,16 @@ def shot_gesture():
     parts = [background(), title("Pinch to grab. Move to scroll.", "Like dragging a touchscreen — without touching anything.")]
 
     x = 90
-    parts += [card(x, cy, 1), hand(OPEN, x + 50, cy + 36), pill(x + 70, cy + 350, 200, "Hand found", "#00000059", "#ffd166"),
+    hs = 1.2
+    hx = (340 - HANDS["open"][1]["w"] * hs) / 2
+    parts += [card(x, cy, 1), hand("open", x + hx, cy - 34, hs), pill(x + 70, cy + 350, 200, "Hand found", "#00000059", "#ffd166"),
               caption(x, cy, "Show your hand")]
     x = 470
-    parts += [card(x, cy, 2, True), hand(PINCH, x + 50, cy + 36, pinched=True), pill(x + 70, cy + 350, 200, "Grabbing", GREEN, "#012"),
+    parts += [card(x, cy, 2, True), hand("pinch", x + hx, cy - 34, hs), pill(x + 70, cy + 350, 200, "Grabbing", GREEN, "#012"),
               caption(x, cy, "Pinch to grab the page")]
     x = 850
     parts += [card(x, cy, 3),
-              hand(PINCH, x + 12, cy + 140, .6, .14, True),
-              hand(PINCH, x + 12, cy + 80, .6, 1, True),
+              hand("pinch", x - 34, cy + 6, .8),
               f'<g stroke="{MINT}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none">'
               f'<path d="M{x+150} {cy+300} L{x+150} {cy+100}"/><path d="M{x+140} {cy+114} L{x+150} {cy+98} L{x+160} {cy+114}"/></g>',
               mini_page(x + 172, cy + 74, 144, 250, scroll=70),
@@ -239,7 +241,10 @@ def shot_settings():
     sx, sy, sw, sh = wx + 14, wy + 48, ww - 28, (ww - 28) * 3 / 4
     parts.append(f'<rect x="{sx}" y="{sy}" width="{sw}" height="{sh:.0f}" rx="10" fill="#000"/>')
     parts.append(f'<rect x="{sx}" y="{sy}" width="{sw}" height="{sh:.0f}" rx="10" fill="{MINT}" fill-opacity=".04"/>')
-    parts.append(hand(PINCH, sx + 105, sy + 20, .95, 1, True))
+    ps = 1.25
+    parts.append(f'<clipPath id="cam"><rect x="{sx}" y="{sy}" width="{sw}" height="{sh:.0f}" rx="10"/></clipPath>'
+                 f'<g clip-path="url(#cam)">'
+                 + hand("pinch", sx + (sw - HANDS["pinch"][1]["w"] * ps) / 2, sy - 30, ps) + '</g>')
     parts.append(f'<rect x="{sx+12}" y="{sy+12}" width="292" height="28" rx="14" fill="{GREEN}"/>'
                  f'<text {FONT} x="{sx+26}" y="{sy+31}" fill="#012" font-size="13" font-weight="700">Grabbing — move to scroll  ·  pinch 0.14</text>')
     y = sy + sh + 30
