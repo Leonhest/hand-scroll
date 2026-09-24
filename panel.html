@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Hand Scroll</title>
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <div id="app">
+    <div class="stage">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="overlay"></canvas>
+      <div id="badge" class="badge idle">Starting…</div>
+    </div>
+
+    <div class="row">
+      <label>Sensitivity <span id="sensVal">1.0</span>×</label>
+      <input id="sens" type="range" min="0.3" max="3" step="0.1" value="1">
+    </div>
+    <div class="row">
+      <label>Pinch strictness <span id="pinchVal">0.22</span> <span class="hint">(lower = fingers must be closer)</span></label>
+      <input id="pinch" type="range" min="0.10" max="0.40" step="0.01" value="0.22">
+    </div>
+    <div class="row toggles">
+      <label><input id="invert" type="checkbox"> Invert direction</label>
+      <label><input id="momentum" type="checkbox" checked> Momentum</label>
+    </div>
+    <div class="row buttons">
+      <button id="background" class="primary" disabled>Run in background (hide camera)</button>
+      <button id="pip">Pop out (always on top)</button>
+    </div>
+    <p id="hint" class="hint">
+      Pinch thumb + index together to grab the page, then move your hand up or down. Release to let go.<br><br>
+      <b>Run in background</b> closes this window and keeps tracking invisibly. The toolbar icon then toggles it on/off;
+      right-click the icon to come back here.
+    </p>
+    <p id="error" class="error hidden"></p>
+    <details class="diag">
+      <summary>Diagnostics <button id="clearLog">clear</button></summary>
+      <pre id="log"></pre>
+    </details>
+  </div>
+  <script type="module" src="panel.js"></script>
+</body>
+</html>

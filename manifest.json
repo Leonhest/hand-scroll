@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Hand Scroll",
+  "version": "0.2.0",
+  "description": "Pinch your thumb and index finger in front of the webcam and drag to scroll the page.",
+  "action": {
+    "default_title": "Hand Scroll: off (click to turn on)"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "scripting",
+    "tabs",
+    "storage",
+    "offscreen",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
+  "icons": {
+    "128": "icon.png"
+  }
+}
