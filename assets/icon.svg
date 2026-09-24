@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1f7a5e"/>
+      <stop offset="1" stop-color="#0d4433"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#bg)"/>
+
+  <!-- scroll axis: the page moves up/down -->
+  <g stroke="#6ae7c2" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity=".5">
+    <path d="M26 44 L26 84"/>
+    <path d="M17 53 L26 42 L35 53"/>
+    <path d="M17 75 L26 86 L35 75"/>
+  </g>
+
+  <!-- pincer: index finger above, thumb below, tips nearly meeting -->
+  <g fill="none" stroke="#ffffff" stroke-width="15" stroke-linecap="round">
+    <path d="M104 34 Q 68 36 66 57"/>
+    <path d="M100 100 Q 70 96 68 74"/>
+  </g>
+
+  <!-- contact point -->
+  <circle cx="67" cy="65.5" r="8.5" fill="#0d4433"/>
+  <circle cx="67" cy="65.5" r="4" fill="#6ae7c2"/>
+</svg>

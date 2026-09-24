@@ -1,0 +1,16 @@
+<!-- Simplified mark for 16/32px: the arrows turn to mush at small sizes. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1f7a5e"/>
+      <stop offset="1" stop-color="#0d4433"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="26" fill="url(#bg)"/>
+  <g fill="none" stroke="#ffffff" stroke-width="20" stroke-linecap="round">
+    <path d="M96 26 Q 44 30 41 60"/>
+    <path d="M96 102 Q 46 98 43 70"/>
+  </g>
+  <circle cx="42" cy="64.5" r="11" fill="#0d4433"/>
+  <circle cx="42" cy="64.5" r="5" fill="#6ae7c2"/>
+</svg>
