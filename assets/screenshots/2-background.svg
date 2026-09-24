@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" width="1280" height="800">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#17664d"/><stop offset="1" stop-color="#082b20"/>
+  </linearGradient>
+  <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+    <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000" flood-opacity=".45"/>
+  </filter>
+</defs>
+<rect width="1280" height="800" fill="url(#bg)"/>
+<text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="640" y="112" text-anchor="middle" fill="#fff" font-size="54" font-weight="700">No camera window. Just scroll.</text><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="640" y="158" text-anchor="middle" fill="#9fdcc7" font-size="24">Tracking runs invisibly in the background while you read.</text>
+<g filter="url(#shadow)"><rect x="150" y="210" width="980" height="540" rx="14" fill="#fbfcfb"/></g>
+
+<path d="M150 224 a14 14 0 0 1 14 -14 h952 a14 14 0 0 1 14 14 v76 h-980 z" fill="#e6ebe8"/>
+<circle cx="172" cy="232" r="6" fill="#f26b5b"/><circle cx="192" cy="232" r="6" fill="#f5bf4f"/><circle cx="212" cy="232" r="6" fill="#5dc766"/>
+<path d="M240 254 v-20 a8 8 0 0 1 8 -8 h204 a8 8 0 0 1 8 8 v20 z" fill="#fbfcfb"/>
+<text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="260" y="246" fill="#334" font-size="14">Weeknight lasagne — Recipe</text>
+<rect x="150" y="254" width="980" height="46" fill="#fbfcfb"/>
+<rect x="250" y="263" width="720" height="30" rx="15" fill="#eef1ef"/>
+<text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="272" y="283" fill="#667" font-size="14">example-recipes.com/weeknight-lasagne</text>
+<line x1="150" y1="300" x2="1130" y2="300" stroke="#e1e6e3"/>
+
+<rect x="1006" y="260" width="40" height="36" rx="10" fill="#6ae7c2" fill-opacity=".25"/>
+<image x="1012" y="264" width="28" height="28" href="data:image/png;base64,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"/>
+<rect x="1026" y="281" width="26" height="15" rx="4" fill="#06d6a0"/>
+<text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="1039" y="292.5" text-anchor="middle" fill="#012" font-size="10" font-weight="800">ON</text>
+<circle cx="1072" cy="278" r="11" fill="#dfe5e2"/>
+<g fill="#8a9690"><circle cx="1104" cy="271" r="2.4"/><circle cx="1104" cy="278" r="2.4"/><circle cx="1104" cy="285" r="2.4"/></g>
+
+<text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="240" y="340" fill="#1c2b26" font-size="34" font-weight="700">Weeknight lasagne</text>
+<text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="240" y="372" fill="#6b7a74" font-size="16">Serves 4 · 45 minutes</text>
+<clipPath id="dish"><rect x="240" y="398" width="330" height="200" rx="12"/></clipPath>
+<g clip-path="url(#dish)">
+  <rect x="240" y="398" width="330" height="200" fill="#f1e7da"/>
+  <rect x="280" y="432" width="250" height="138" rx="8" fill="#ffffff"/>
+  <g transform="translate(315,444)">
+    <path d="M0 18 Q 90 -4 180 18 V 26 H 0 Z" fill="#e8a33d"/>
+    <rect y="26" width="180" height="14" fill="#f4e2b8"/>
+    <rect y="40" width="180" height="16" fill="#b8452e"/>
+    <rect y="56" width="180" height="11" fill="#f4e2b8"/>
+    <rect y="67" width="180" height="16" fill="#c2533a"/>
+    <rect y="83" width="180" height="11" fill="#f4e2b8"/>
+    <rect y="94" width="180" height="12" fill="#a83f2a"/>
+  </g>
+  <g fill="#5f9e4a"><circle cx="360" cy="458" r="5"/><circle cx="420" cy="452" r="4"/><circle cx="465" cy="459" r="4.5"/></g>
+</g>
+<text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="620" y="436" fill="#1c2b26" font-size="20" font-weight="700">Method</text>
+<circle cx="632" cy="468" r="12" fill="#e6f3ee"/><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="632" y="473" text-anchor="middle" fill="#1f7a5e" font-size="13" font-weight="700">1</text><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="654" y="474" fill="#3b4a45" font-size="17">Brown the mince with onion and garlic.</text>
+<circle cx="632" cy="502" r="12" fill="#e6f3ee"/><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="632" y="507" text-anchor="middle" fill="#1f7a5e" font-size="13" font-weight="700">2</text><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="654" y="508" fill="#3b4a45" font-size="17">Stir in tomatoes; simmer 15 min.</text>
+<circle cx="632" cy="536" r="12" fill="#e6f3ee"/><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="632" y="541" text-anchor="middle" fill="#1f7a5e" font-size="13" font-weight="700">3</text><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="654" y="542" fill="#3b4a45" font-size="17">Layer sauce, pasta sheets and béchamel.</text>
+<circle cx="632" cy="570" r="12" fill="#e6f3ee"/><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="632" y="575" text-anchor="middle" fill="#1f7a5e" font-size="13" font-weight="700">4</text><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="654" y="576" fill="#3b4a45" font-size="17">Top with cheese. Bake 25 min at 190°C.</text>
+<circle cx="632" cy="604" r="12" fill="#e6f3ee"/><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="632" y="609" text-anchor="middle" fill="#1f7a5e" font-size="13" font-weight="700">5</text><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="654" y="610" fill="#3b4a45" font-size="17">Rest 5 minutes before slicing.</text>
+
+<g>
+  <path d="M1018 314 L1026 304 L1034 314 Z" fill="#0d3a2c"/>
+  <rect x="766" y="314" width="300" height="84" rx="14" fill="#0d3a2c"/>
+  <text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="786" y="348" fill="#fff" font-size="19" font-weight="700">Click to turn on or off</text>
+  <text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="786" y="374" fill="#9fdcc7" font-size="15">Your camera light shows when it's on.</text>
+</g>
+
+<g transform="translate(620,660)">
+  <rect width="420" height="60" rx="12" fill="#eef7f3" stroke="#cfe9df"/>
+  <text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="20" y="37" fill="#1f7a5e" font-size="17" font-weight="600">Messy hands? Pinch the air to scroll the recipe.</text>
+</g>
+</svg>

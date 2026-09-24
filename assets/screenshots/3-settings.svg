@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" width="1280" height="800">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#17664d"/><stop offset="1" stop-color="#082b20"/>
+  </linearGradient>
+  <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+    <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000" flood-opacity=".45"/>
+  </filter>
+</defs>
+<rect width="1280" height="800" fill="url(#bg)"/>
+
+<text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="110" y="250" fill="#fff" font-size="50" font-weight="700">Tune it to</text>
+<text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="110" y="310" fill="#fff" font-size="50" font-weight="700">your hand.</text>
+<text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="110" y="366" fill="#9fdcc7" font-size="22">Right-click the toolbar icon for a live</text>
+<text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="110" y="396" fill="#9fdcc7" font-size="22">preview and settings.</text>
+<circle cx="122" cy="462" r="11" fill="#6ae7c2" fill-opacity=".2"/><path d="M116 462 l4 4 l8 -8" stroke="#6ae7c2" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="146" y="468" fill="#fff" font-size="19" font-weight="700">Pinch strictness</text><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="146" y="492" fill="#8cc9b4" font-size="16">How close your fingers must be</text>
+<circle cx="122" cy="524" r="11" fill="#6ae7c2" fill-opacity=".2"/><path d="M116 524 l4 4 l8 -8" stroke="#6ae7c2" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="146" y="530" fill="#fff" font-size="19" font-weight="700">Sensitivity</text><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="146" y="554" fill="#8cc9b4" font-size="16">How far the page moves</text>
+<circle cx="122" cy="586" r="11" fill="#6ae7c2" fill-opacity=".2"/><path d="M116 586 l4 4 l8 -8" stroke="#6ae7c2" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="146" y="592" fill="#fff" font-size="19" font-weight="700">Momentum</text><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="146" y="616" fill="#8cc9b4" font-size="16">Flick to coast, like a phone</text>
+<circle cx="122" cy="648" r="11" fill="#6ae7c2" fill-opacity=".2"/><path d="M116 648 l4 4 l8 -8" stroke="#6ae7c2" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="146" y="654" fill="#fff" font-size="19" font-weight="700">Runs on-device</text><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="146" y="678" fill="#8cc9b4" font-size="16">No video ever leaves your computer</text>
+<g filter="url(#shadow)"><rect x="700" y="86" width="460" height="628" rx="14" fill="#111"/></g>
+
+<path d="M700 100 a14 14 0 0 1 14 -14 h432 a14 14 0 0 1 14 14 v20 h-460 z" fill="#262626"/>
+<circle cx="720" cy="103" r="6" fill="#f26b5b"/><circle cx="740" cy="103" r="6" fill="#f5bf4f"/><circle cx="760" cy="103" r="6" fill="#5dc766"/>
+<text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="930.0" y="108" text-anchor="middle" fill="#bbb" font-size="13" font-weight="600">Hand Scroll</text>
+<rect x="714" y="134" width="432" height="324" rx="10" fill="#000"/>
+<rect x="714" y="134" width="432" height="324" rx="10" fill="#6ae7c2" fill-opacity=".04"/>
+<g opacity="1">
+<line x1="933.0" y1="424.8" x2="898.8" y2="395.3" stroke="#fff" stroke-opacity=".55" stroke-width="6.6" stroke-linecap="round"/>
+<line x1="898.8" y1="395.3" x2="877.9" y2="364.9" stroke="#fff" stroke-opacity=".55" stroke-width="6.6" stroke-linecap="round"/>
+<line x1="877.9" y1="364.9" x2="866.5" y2="325.0" stroke="#fff" stroke-opacity=".55" stroke-width="6.6" stroke-linecap="round"/>
+<line x1="866.5" y1="325.0" x2="876.0" y2="285.1" stroke="#fff" stroke-opacity=".55" stroke-width="6.6" stroke-linecap="round"/>
+<line x1="933.0" y1="424.8" x2="908.3" y2="313.6" stroke="#fff" stroke-opacity=".55" stroke-width="6.6" stroke-linecap="round"/>
+<line x1="908.3" y1="313.6" x2="893.1" y2="273.7" stroke="#fff" stroke-opacity=".55" stroke-width="6.6" stroke-linecap="round"/>
+<line x1="893.1" y1="273.7" x2="877.9" y2="250.9" stroke="#fff" stroke-opacity=".55" stroke-width="6.6" stroke-linecap="round"/>
+<line x1="877.9" y1="250.9" x2="869.4" y2="261.4" stroke="#fff" stroke-opacity=".55" stroke-width="6.6" stroke-linecap="round"/>
+<line x1="908.3" y1="313.6" x2="936.8" y2="307.9" stroke="#fff" stroke-opacity=".55" stroke-width="6.6" stroke-linecap="round"/>
+<line x1="936.8" y1="307.9" x2="934.9" y2="260.4" stroke="#fff" stroke-opacity=".55" stroke-width="6.6" stroke-linecap="round"/>
+<line x1="934.9" y1="260.4" x2="934.0" y2="230.0" stroke="#fff" stroke-opacity=".55" stroke-width="6.6" stroke-linecap="round"/>
+<line x1="934.0" y1="230.0" x2="934.0" y2="203.4" stroke="#fff" stroke-opacity=".55" stroke-width="6.6" stroke-linecap="round"/>
+<line x1="936.8" y1="307.9" x2="962.5" y2="315.5" stroke="#fff" stroke-opacity=".55" stroke-width="6.6" stroke-linecap="round"/>
+<line x1="962.5" y1="315.5" x2="967.2" y2="273.7" stroke="#fff" stroke-opacity=".55" stroke-width="6.6" stroke-linecap="round"/>
+<line x1="967.2" y1="273.7" x2="971.0" y2="247.1" stroke="#fff" stroke-opacity=".55" stroke-width="6.6" stroke-linecap="round"/>
+<line x1="971.0" y1="247.1" x2="973.9" y2="224.3" stroke="#fff" stroke-opacity=".55" stroke-width="6.6" stroke-linecap="round"/>
+<line x1="962.5" y1="315.5" x2="985.2" y2="332.6" stroke="#fff" stroke-opacity=".55" stroke-width="6.6" stroke-linecap="round"/>
+<line x1="985.2" y1="332.6" x2="995.7" y2="302.2" stroke="#fff" stroke-opacity=".55" stroke-width="6.6" stroke-linecap="round"/>
+<line x1="995.7" y1="302.2" x2="1002.4" y2="283.2" stroke="#fff" stroke-opacity=".55" stroke-width="6.6" stroke-linecap="round"/>
+<line x1="1002.4" y1="283.2" x2="1007.1" y2="264.2" stroke="#fff" stroke-opacity=".55" stroke-width="6.6" stroke-linecap="round"/>
+<line x1="933.0" y1="424.8" x2="985.2" y2="332.6" stroke="#fff" stroke-opacity=".55" stroke-width="6.6" stroke-linecap="round"/>
+<circle cx="933.0" cy="424.8" r="6.2" fill="#fff"/>
+<circle cx="898.8" cy="395.3" r="6.2" fill="#fff"/>
+<circle cx="877.9" cy="364.9" r="6.2" fill="#fff"/>
+<circle cx="866.5" cy="325.0" r="6.2" fill="#fff"/>
+<circle cx="908.3" cy="313.6" r="6.2" fill="#fff"/>
+<circle cx="893.1" cy="273.7" r="6.2" fill="#fff"/>
+<circle cx="877.9" cy="250.9" r="6.2" fill="#fff"/>
+<circle cx="936.8" cy="307.9" r="6.2" fill="#fff"/>
+<circle cx="934.9" cy="260.4" r="6.2" fill="#fff"/>
+<circle cx="934.0" cy="230.0" r="6.2" fill="#fff"/>
+<circle cx="934.0" cy="203.4" r="6.2" fill="#fff"/>
+<circle cx="962.5" cy="315.5" r="6.2" fill="#fff"/>
+<circle cx="967.2" cy="273.7" r="6.2" fill="#fff"/>
+<circle cx="971.0" cy="247.1" r="6.2" fill="#fff"/>
+<circle cx="973.9" cy="224.3" r="6.2" fill="#fff"/>
+<circle cx="985.2" cy="332.6" r="6.2" fill="#fff"/>
+<circle cx="995.7" cy="302.2" r="6.2" fill="#fff"/>
+<circle cx="1002.4" cy="283.2" r="6.2" fill="#fff"/>
+<circle cx="1007.1" cy="264.2" r="6.2" fill="#fff"/>
+<line x1="876.0" y1="285.1" x2="869.4" y2="261.4" stroke="#06d6a0" stroke-width="4.8" stroke-linecap="round"/>
+<circle cx="872.7" cy="273.2" r="25.6" fill="#06d6a0" fill-opacity=".2"/>
+<circle cx="876.0" cy="285.1" r="10.0" fill="#06d6a0"/>
+<circle cx="869.4" cy="261.4" r="10.0" fill="#06d6a0"/>
+</g>
+<rect x="726" y="146" width="292" height="28" rx="14" fill="#06d6a0"/><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="740" y="165" fill="#012" font-size="13" font-weight="700">Grabbing — move to scroll  ·  pinch 0.14</text>
+<text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="714" y="488.0" fill="#eee" font-size="14">Sensitivity <tspan fill="#fff" font-weight="700">1.2×</tspan><tspan fill="#888" dx="6"></tspan></text><rect x="714" y="500.0" width="432" height="5" rx="2.5" fill="#3a3a3a"/><rect x="714" y="500.0" width="143" height="5" rx="2.5" fill="#8ab4f8"/><circle cx="857" cy="502.5" r="8" fill="#8ab4f8"/>
+<text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="714" y="540.0" fill="#eee" font-size="14">Pinch strictness <tspan fill="#fff" font-weight="700">0.22</tspan><tspan fill="#888" dx="6">(lower = fingers must be closer)</tspan></text><rect x="714" y="552.0" width="432" height="5" rx="2.5" fill="#3a3a3a"/><rect x="714" y="552.0" width="173" height="5" rx="2.5" fill="#8ab4f8"/><circle cx="887" cy="554.5" r="8" fill="#8ab4f8"/>
+
+<rect x="714" y="580.0" width="15" height="15" rx="3" fill="none" stroke="#aaa" stroke-width="1.5"/>
+<text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="738" y="592.0" fill="#eee" font-size="14">Invert direction</text>
+<rect x="884" y="580.0" width="15" height="15" rx="3" fill="#8ab4f8"/>
+<path d="M887 587.5 l3 3 l6 -6" stroke="#111" stroke-width="2" fill="none" stroke-linecap="round"/>
+<text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="908" y="592.0" fill="#eee" font-size="14">Momentum</text>
+<rect x="714" y="614.0" width="432" height="36" rx="8" fill="#06d6a0"/><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="930.0" y="637.0" text-anchor="middle" fill="#012" font-size="14" font-weight="700">Run in background (hide camera)</text>
+<rect x="714" y="658.0" width="432" height="36" rx="8" fill="#333"/><text font-family="Helvetica Neue, Helvetica, Arial, sans-serif" x="930.0" y="681.0" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">Pop out (always on top)</text>
+</svg>
