@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generates the Chrome Web Store screenshots (1280x800) as SVG, then PNG via
-rsvg-convert. Hands are Blender renders from hands/render_hands.py; run that
-first after changing hands/poses.json. Run from anywhere:
+rsvg-convert. Hands are Blender renders from hands/render_hands.py; re-run
+that first after changing a pose. Run from anywhere:
 python3 assets/screenshots/make.py"""
 import base64
 import json
