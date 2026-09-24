@@ -8,12 +8,14 @@ so the screenshot generator can overlay tracking dots exactly on the render.
 
 The hand is a hybrid: fingers are tapered tubes swept along smooth splines
 through their joints (no sausage bulges), while palm, thumb pad, thumb web and
-forearm are metaballs so they blend organically. A voxel remesh fuses it all
-into one surface, and a light smooth softens the seams.
+thumb-pad metaballs blend organically. A voxel remesh fuses it all into one
+surface, a light smooth softens the seams, and a crease map (palm lines and
+finger joint creases, drawn from the landmarks) is displaced into the palm side.
 """
 import json
 import math
 import os
+import subprocess
 import sys
 
 import bpy
@@ -31,8 +33,9 @@ def srgb(hex_):
     return tuple(v / 12.92 if v <= 0.04045 else ((v + 0.055) / 1.055) ** 2.4 for v in c)
 
 
-SKIN = srgb("#d9a07c")
-NAIL = srgb("#f0c9bb")
+SKIN = srgb("#d49776")
+SKIN_FLUSH = srgb("#cf7c63")   # knuckles, fingertips: where skin reads redder
+NAIL = srgb("#dea08e")
 RIM = srgb("#6ae7c2")         # brand mint rim light
 
 THRESHOLD = 0.6
@@ -79,16 +82,52 @@ def reset_scene():
 
 
 def skin_material():
+    """Skin: subsurface, redder on convex areas, darker in creases, fine bump."""
     mat = bpy.data.materials.new("skin")
     mat.use_nodes = True
-    bsdf = mat.node_tree.nodes["Principled BSDF"]
-    bsdf.inputs["Base Color"].default_value = (*SKIN, 1)
-    bsdf.inputs["Roughness"].default_value = 0.55
-    for name, val in (("Subsurface Weight", 0.35), ("Subsurface Scale", 0.04)):
-        if name in bsdf.inputs:
-            bsdf.inputs[name].default_value = val
-    if "Subsurface Radius" in bsdf.inputs:
-        bsdf.inputs["Subsurface Radius"].default_value = (1.0, 0.45, 0.3)
+    nt = mat.node_tree
+    N, L = nt.nodes, nt.links
+    bsdf = N["Principled BSDF"]
+
+    geo = N.new("ShaderNodeNewGeometry")
+    flush_ramp = N.new("ShaderNodeValToRGB")          # pointiness → redness
+    flush_ramp.color_ramp.elements[0].position = 0.49
+    flush_ramp.color_ramp.elements[1].position = 0.54
+    L.new(geo.outputs["Pointiness"], flush_ramp.inputs["Fac"])
+    flush = N.new("ShaderNodeMix")
+    flush.data_type = "RGBA"
+    flush.inputs["A"].default_value = (*SKIN, 1)
+    flush.inputs["B"].default_value = (*SKIN_FLUSH, 1)
+    L.new(flush_ramp.outputs["Color"], flush.inputs["Factor"])
+
+    ao = N.new("ShaderNodeAmbientOcclusion")          # creases a touch darker
+    ao.inputs["Distance"].default_value = 0.05
+    ao_ramp = N.new("ShaderNodeMapRange")
+    ao_ramp.inputs["To Min"].default_value = 0.72
+    L.new(ao.outputs["AO"], ao_ramp.inputs["Value"])
+    shade = N.new("ShaderNodeMix")
+    shade.data_type = "RGBA"
+    shade.blend_type = "MULTIPLY"
+    shade.inputs["Factor"].default_value = 1.0
+    L.new(flush.outputs["Result"], shade.inputs["A"])
+    L.new(ao_ramp.outputs["Result"], shade.inputs["B"])
+    L.new(shade.outputs["Result"], bsdf.inputs["Base Color"])
+
+    coord = N.new("ShaderNodeTexCoord")               # skin micro-texture
+    noise = N.new("ShaderNodeTexNoise")
+    noise.inputs["Scale"].default_value = 220
+    noise.inputs["Detail"].default_value = 6
+    L.new(coord.outputs["Object"], noise.inputs["Vector"])
+    bump = N.new("ShaderNodeBump")
+    bump.inputs["Strength"].default_value = 0.08
+    bump.inputs["Distance"].default_value = 0.002
+    L.new(noise.outputs["Fac"], bump.inputs["Height"])
+    L.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
+
+    bsdf.inputs["Roughness"].default_value = 0.5
+    bsdf.inputs["Subsurface Weight"].default_value = 0.5
+    bsdf.inputs["Subsurface Radius"].default_value = (1.0, 0.38, 0.22)
+    bsdf.inputs["Subsurface Scale"].default_value = 0.025
     return mat
 
 
@@ -97,7 +136,9 @@ def nail_material():
     mat.use_nodes = True
     bsdf = mat.node_tree.nodes["Principled BSDF"]
     bsdf.inputs["Base Color"].default_value = (*NAIL, 1)
-    bsdf.inputs["Roughness"].default_value = 0.25
+    bsdf.inputs["Roughness"].default_value = 0.32
+    bsdf.inputs["Subsurface Weight"].default_value = 0.3
+    bsdf.inputs["Subsurface Scale"].default_value = 0.01
     return mat
 
 
@@ -147,26 +188,15 @@ def build_palm(P):
     add_ellipsoid(mb, web_c, to_world(P[5]) - to_world(P[2]), (22, 9, 6))
     hypo_c = P[0] * 0.45 + P[17] * 0.55 + Vector((2, 0, -1))
     add_ellipsoid(mb, hypo_c, up, (38, 15, 11))
-    # wrist and forearm, running off the bottom of the frame
-    down = (P[0] - knuckles).normalized()
-    add_capsule(mb, P[0] - down * 10, P[0] + down * 170, 27)
     return obj
 
 
-def build_finger(P, chain, radii):
-    """Tapered tube along a smooth spline from inside the palm to the tip."""
-    pts = [P[i] for i in chain]
-    tip_dir = (pts[-1] - pts[-2]).normalized()
-    r_tip = radii[-1]
-    base = pts[0] + (pts[0] - pts[1]).normalized() * 10       # start inside the palm
-    end = pts[-1] - tip_dir * r_tip                           # fingertip sphere centre
-    path = [base] + pts[:-1] + [end]
-    rads = [radii[0]] + radii[:-1] + [r_tip]
-
-    cu = bpy.data.curves.new("finger", "CURVE")
+def tube(path, rads, cap_sphere=None, bevel_res=8):
+    """Tapered tube along a smooth spline; optional sphere (centre, radius) cap."""
+    cu = bpy.data.curves.new("tube", "CURVE")
     cu.dimensions = "3D"
     cu.bevel_depth = U
-    cu.bevel_resolution = 8
+    cu.bevel_resolution = bevel_res
     cu.resolution_u = 16
     cu.use_fill_caps = True
     sp = cu.splines.new("BEZIER")
@@ -175,17 +205,58 @@ def build_finger(P, chain, radii):
         bp.co = to_world(p)
         bp.handle_left_type = bp.handle_right_type = "AUTO"
         bp.radius = r
-    obj = bpy.data.objects.new("finger", cu)
+    obj = bpy.data.objects.new("tube", cu)
     bpy.context.collection.objects.link(obj)
+    out = [obj]
+    if cap_sphere:
+        c, r = cap_sphere
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=48, ring_count=24, radius=r * U, location=to_world(c))
+        out.append(bpy.context.active_object)
+    return out
 
-    bpy.ops.mesh.primitive_uv_sphere_add(segments=48, ring_count=24, radius=r_tip * U,
-                                         location=to_world(end))
-    return [obj, bpy.context.active_object]
+
+def build_finger(P, chain, radii):
+    """From inside the palm to the tip. Joints are pinched in slightly and each
+    segment swells a little between them, like the pads of a real finger."""
+    pts = [P[i] for i in chain]
+    tip_dir = (pts[-1] - pts[-2]).normalized()
+    r_tip = radii[-1]
+    base = pts[0] + (pts[0] - pts[1]).normalized() * 10
+    end = pts[-1] - tip_dir * r_tip
+    joints = pts[:-1] + [end]
+    jr = radii[:-1] + [r_tip]
+    path, rads = [base], [radii[0]]
+    for k in range(len(joints) - 1):
+        a, b, ra, rb = joints[k], joints[k + 1], jr[k], jr[k + 1]
+        path += [a, (a + b) / 2]
+        rads += [ra * (0.97 if k else 1.0), (ra + rb) / 2 * 1.05]
+    path.append(end)
+    rads.append(r_tip)
+    return tube(path, rads, cap_sphere=(end, r_tip))
+
+
+def build_forearm(P):
+    """Narrows at the wrist, then widens into the forearm off the frame."""
+    knuckles = (P[5] + P[9] + P[13] + P[17]) / 4
+    down = (P[0] - knuckles).normalized()
+    # starts inside the palm heel, capped round, so no flat end shows
+    start = P[0] - down * 34
+    path = [start, P[0] - down * 8, P[0] + down * 22, P[0] + down * 90, P[0] + down * 175]
+    rads = [17, 26, 26, 30, 32]
+    parts = tube(path, rads, cap_sphere=(start, 17), bevel_res=16)
+    # wrists are wider than deep: flatten toward the palm plane (z = 0)
+    for o in parts:
+        if o.type == "CURVE":
+            o.scale.z = 0.55
+        else:
+            o.scale = (1, 1, 0.55)
+            o.location.z *= 0.55
+    return parts
 
 
 def build_hand(pts):
     P = [Vector(p) for p in pts]
-    parts = [build_palm(P)]
+    parts = [build_palm(P)] + build_forearm(P)
     for name, (chain, radii) in FINGERS.items():
         if name == "thumb":
             parts += build_finger(P, chain[1:], radii[1:])     # metacarpal is in the palm
@@ -204,16 +275,116 @@ def build_hand(pts):
 
     remesh = hand.modifiers.new("fuse", "REMESH")
     remesh.mode = "VOXEL"
-    remesh.voxel_size = 0.7 * U
+    remesh.voxel_size = 0.55 * U
     smooth = hand.modifiers.new("soften", "SMOOTH")
     smooth.factor = 0.6
     smooth.iterations = 12
     bpy.ops.object.modifier_apply(modifier="fuse")
     bpy.ops.object.modifier_apply(modifier="soften")
+    add_creases(hand, pts)
     bpy.ops.object.shade_smooth()
     hand.data.materials.clear()
     hand.data.materials.append(skin_material())
     return hand
+
+
+# ---------------- creases
+# The crease map is drawn in illustration units over this square, then
+# projected straight down the view axis onto the hand.
+CREASE_BOX = (-45, 0, 360)          # x0, y0, size
+CREASE_PX = 1800
+
+
+def crease_svg(pts):
+    """Palm lines and finger joint creases, positioned from the landmarks."""
+    P = [Vector(p[:2]) for p in pts]
+    lines = []
+
+    def q(a, c, b, w):
+        """Palm line that thins toward both ends (three nested dash spans)."""
+        d = f"M{a.x:.1f} {a.y:.1f} Q{c.x:.1f} {c.y:.1f} {b.x:.1f} {b.y:.1f}"
+        for frac, width in ((1.0, w * 0.45), (0.75, w * 0.75), (0.45, w)):
+            gap = (1 - frac) / 2 * 100
+            lines.append(f'<path d="{d}" pathLength="100" stroke-width="{width:.2f}" '
+                         f'stroke-dasharray="0 {gap:.1f} {frac*100:.1f} 100"/>')
+
+    V = lambda x, y: Vector((x, y))
+    # heart line: from under the pinky knuckle, curving up between index and middle
+    q(P[17] + V(12, 22), P[13] + V(-4, 40), (P[5] + P[9]) / 2 + V(2, 12), 3.2)
+    # head line: from the thumb-index web, drifting down across the palm
+    q(P[5] + V(-10, 30), (P[9] + P[13]) / 2 + V(-10, 52), P[17] + V(-2, 62), 3.0)
+    # life line: arcs around the thumb pad down to the wrist
+    q(P[5] + V(-8, 32), P[1] + V(40, -34), P[0] + V(-14, -14), 3.2)
+    # wrist crease
+    q(P[0] + V(-24, -4), P[0] + V(0, 2), P[0] + V(24, -4), 2.2)
+
+    def cross(center, bone, half, w):
+        n = Vector((-bone.y, bone.x)).normalized() * half
+        a, b = center - n, center + n
+        lines.append(f'<line x1="{a.x:.1f}" y1="{a.y:.1f}" x2="{b.x:.1f}" y2="{b.y:.1f}" stroke-width="{w}"/>')
+
+    for name, (chain, radii) in FINGERS.items():
+        mcp, pip, dip, tip = (P[i] for i in chain)
+        if name == "thumb":
+            cross(pip, (dip - pip).normalized(), radii[1] * 0.55, 1.8)       # thumb MCP
+            cross(dip, (tip - dip).normalized(), radii[2] * 0.55, 1.8)       # thumb IP
+            continue
+        bone = (pip - mcp).normalized()
+        cross(mcp + (pip - mcp) * 0.3, bone, radii[0] * 0.6, 2.0)           # finger base
+        for off in (-1.6, 1.6):                                              # PIP: double crease
+            cross(pip + bone * off, bone, radii[1] * 0.55, 1.4)
+        cross(dip, (tip - dip).normalized(), radii[2] * 0.5, 1.4)           # DIP
+
+    x0, y0, size = CREASE_BOX
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{x0} {y0} {size} {size}" '
+            f'width="{CREASE_PX}" height="{CREASE_PX}">'
+            f'<defs><filter id="b"><feGaussianBlur stdDeviation="1.3"/></filter></defs>'
+            f'<rect x="{x0}" y="{y0}" width="{size}" height="{size}" fill="#000"/>'
+            f'<g fill="none" stroke="#fff" stroke-linecap="round" filter="url(#b)">{"".join(lines)}</g></svg>')
+
+
+def add_creases(hand, pts):
+    cache = os.path.join(HERE, ".cache")
+    os.makedirs(cache, exist_ok=True)
+    svg, png = os.path.join(cache, "creases.svg"), os.path.join(cache, "creases.png")
+    with open(svg, "w") as f:
+        f.write(crease_svg(pts))
+    subprocess.run(["rsvg-convert", svg, "-o", png], check=True)
+
+    tex = bpy.data.textures.new("creases", "IMAGE")
+    tex.image = bpy.data.images.load(png, check_existing=False)
+    tex.extension = "EXTEND"
+    x0, y0, size = CREASE_BOX
+    proj = bpy.data.objects.new("crease_projector", None)
+    proj.location = ((x0 + size / 2) * U, -(y0 + size / 2) * U, 0)
+    proj.scale = (size / 2 * U, size / 2 * U, 1)
+    bpy.context.collection.objects.link(proj)
+
+    # Only the palm-side layer: fingers curled toward the camera (thumb, a
+    # pinching index) sit above the palm in depth and must not pick up its lines.
+    vg = hand.vertex_groups.new(name="creasable")
+    buckets = {}
+    for v in hand.data.vertices:
+        depth_w = max(0.0, min(1.0, (34 - v.co.z / U) / 10))
+        facing_w = max(0.0, min(1.0, (v.normal.z - 0.4) / 0.4))
+        w = round(depth_w * facing_w, 1)
+        if w:
+            buckets.setdefault(w, []).append(v.index)
+    for w, idx in buckets.items():
+        vg.add(idx, w, "REPLACE")
+
+    disp = hand.modifiers.new("creases", "DISPLACE")
+    disp.texture = tex
+    disp.texture_coords = "OBJECT"
+    disp.texture_coords_object = proj
+    disp.mid_level = 0.0
+    disp.strength = -0.9 * U
+    disp.vertex_group = vg.name
+    soften = hand.modifiers.new("crease_soften", "SMOOTH")
+    soften.factor = 0.5
+    soften.iterations = 2
+    bpy.ops.object.modifier_apply(modifier="creases")
+    bpy.ops.object.modifier_apply(modifier="crease_soften")
 
 
 def add_nails(pts, view_dir):
@@ -233,13 +404,13 @@ def add_nails(pts, view_dir):
         r = radii[3] * U
         bpy.ops.mesh.primitive_uv_sphere_add(segments=32, ring_count=16, radius=1)
         nail = bpy.context.active_object
-        nail.scale = ((b - a).length * 0.42, r * 0.72, r * 0.22)
+        nail.scale = ((b - a).length * 0.36, r * 0.68, r * 0.2)
         # orient: local X along the bone, local Z along dorsal
         y_axis = dorsal.cross(bone).normalized()
         from mathutils import Matrix
         rot = Matrix((bone, y_axis, dorsal)).transposed().to_4x4()
         nail.rotation_euler = rot.to_euler()
-        nail.location = a + (b - a) * 0.62 + dorsal * r * 0.82
+        nail.location = a + (b - a) * 0.55 + dorsal * r * 0.86
         nail.data.materials.append(mat)
         bpy.ops.object.shade_smooth()
 
@@ -283,8 +454,8 @@ def setup_camera_and_lights(pts, yaw_deg, pitch_deg):
     cam.rotation_euler = look_at(cam.location, center)
     bpy.context.scene.camera = cam
 
-    add_light("key", center + Vector((-3.0, 3.0, 5.0)), center, 400, 3.0, (1.0, 0.96, 0.9))
-    add_light("fill", center + Vector((4.0, -0.5, 3.0)), center, 110, 4.0, (0.85, 0.92, 1.0))
+    add_light("key", center + Vector((-3.0, 3.0, 5.0)), center, 470, 2.5, (1.0, 0.96, 0.9))
+    add_light("fill", center + Vector((4.0, -0.5, 3.0)), center, 80, 4.0, (0.85, 0.92, 1.0))
     add_light("rim", center + Vector((1.5, 2.5, -4.0)), center, 500, 2.5, RIM)
     return cam
 
