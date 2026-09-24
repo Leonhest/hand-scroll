@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 280" width="440" height="280">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1b7a5c"/>
+      <stop offset="1" stop-color="#0a3628"/>
+    </linearGradient>
+  </defs>
+  <rect width="440" height="280" fill="url(#bg)"/>
+
+  <!-- pinch mark -->
+  <g transform="translate(58,92) scale(0.95)">
+    <g fill="none" stroke="#ffffff" stroke-width="13" stroke-linecap="round">
+      <path d="M86 6 Q 40 10 37 38"/>
+      <path d="M84 84 Q 42 80 39 54"/>
+    </g>
+    <circle cx="38" cy="45" r="8" fill="#0a3628"/>
+    <circle cx="38" cy="45" r="3.6" fill="#6ae7c2"/>
+  </g>
+
+  <!-- scroll arrows -->
+  <g transform="translate(176,96)" stroke="#6ae7c2" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity=".75">
+    <path d="M0 6 L0 78"/>
+    <path d="M-9 15 L0 4 L9 15"/>
+    <path d="M-9 69 L0 80 L9 69"/>
+  </g>
+
+  <text x="214" y="124" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="34" font-weight="700">Hand Scroll</text>
+  <text x="214" y="154" fill="#9fe8ce" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="17" font-weight="500">Pinch and drag to scroll</text>
+  <text x="214" y="180" fill="#63b79b" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13.5">Runs entirely on your device</text>
+</svg>

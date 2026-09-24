@@ -9,7 +9,7 @@ No video ever leaves the machine, and the extension makes no network requests.
 
 ## Install
 
-Not on the Chrome Web Store — load it unpacked:
+Load it unpacked:
 
 1. Open `chrome://extensions`
 2. Enable **Developer mode** (top right)
@@ -61,6 +61,14 @@ Pinch tuning constants live at the top of `tracker.js`.
 Chrome forbids extensions from scripting `chrome://` pages, the Chrome Web Store,
 and the built-in PDF viewer, so scrolling does not work there. Ordinary websites
 are fine.
+
+## Publishing
+
+`scripts/package.sh` builds the Chrome Web Store upload zip from just the runtime
+files. Listing copy, permission justifications, and asset requirements live in
+[`STORE_LISTING.md`](STORE_LISTING.md); the privacy policy the listing points at is
+[`docs/privacy.html`](docs/privacy.html), served at
+<https://leonhest.github.io/hand-scroll/privacy.html>.
 
 ## Vendored files
 
